@@ -68,6 +68,8 @@ plot(pressure)
 ## References
 European Commission (2010). Europe 2020 – A Strategy for smart, sustainable and inclusive growth. [online] Available at: http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=COM:2010:2020:FIN:EN:PDF [Accessed: 11.10.2016]
 
+Keng, S.H. and Huffman, W.E., 2010. Binge drinking and labor market success: a longitudinal study on young people. Journal of Population Economics, 23(1), pp.303-322.
+
 
 ## Appendices
 
