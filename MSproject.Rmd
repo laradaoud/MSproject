@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-## Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
+# Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
 
 ## Introduction 
 
@@ -28,12 +28,21 @@ The dataset used for this paper contains information about students in Portugal 
 
 ```{r pressure, echo=FALSE}
 sm <- read.csv("student-mat.csv", sep=';')
-
+str(sm)
 summary(sm[,"age"])
 ```
 
-The data set examined provides sample data of two secondary schools in Portugal. The ages of students varies from 15 to 22 years with an average of 16.7 years. 
+The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). The data could be split into six areas of information: 
 
+### 1. Generic Information
+2. Family  
+3. Education
+4. Social life  
+5. Health 
+6. Grades
+The data is includes an abbreviation for each school, sex of the students The ages of students varies from 15 to 22 years with an average of 16.7 years. 
+
+Alongside generic information on each student
 
 ## Descriptive Statistics 
 
@@ -81,12 +90,12 @@ Statista (2016).  Countries with the highest per capita consumption of alcohol i
 =======
 >>>>>>> e1d610a7d350a432b8796c89b01b49246056ddb9
 
-## Appendices
+# Appendices
 
 ## Appendix A
 Attribute Information:
 
-# Attributes in the Dataset: 
+## Attributes in the Dataset: 
 1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira) 
 
 2 sex - student's sex (binary: 'F' - female or 'M' - male) 
