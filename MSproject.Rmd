@@ -11,6 +11,19 @@ Note that the `echo = FALSE` parameter was added to the code chunk to prevent pr
 
 # Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
 
+---
+Content: 
+1. Introduction
+2. Dataset Description
+3. Descriptive Statistics
+4. Correlation Analysis
+5. Hypothesis Testing
+6. Regression 
+7. Conclusion
+8. References
+9. Appendices
+---
+
 ## Introduction 
 
 
@@ -32,17 +45,24 @@ str(sm)
 summary(sm[,"age"])
 ```
 
-The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). The data could be split into six areas of information: 
+The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into six areas of information: 
 
-### 1. Generic Information
-2. Family  
-3. Education
-4. Social life  
-5. Health 
-6. Grades
-The data is includes an abbreviation for each school, sex of the students The ages of students varies from 15 to 22 years with an average of 16.7 years. 
+#### 1. General Information
+General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. The split between male and female students is .....and most student would live in an urban environment (.....), while % live in an rural environment. 
 
-Alongside generic information on each student
+#### 2. Family  
+Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian. 
+
+#### 3. Education
+The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken, whether they have failed to pass any classes and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
+
+#### 4. Social Life  
+The social life section provieds information on activities the student is involved in outside of school. This includes
+
+#### 5. Health 
+
+#### 6. Grades
+The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. 
 
 ## Descriptive Statistics 
 
@@ -95,7 +115,7 @@ Statista (2016).  Countries with the highest per capita consumption of alcohol i
 ## Appendix A
 Attribute Information:
 
-## Attributes in the Dataset: 
+#### Attributes in the Dataset: 
 1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira) 
 
 2 sex - student's sex (binary: 'F' - female or 'M' - male) 
@@ -155,7 +175,7 @@ Attribute Information:
 
 30 absences - number of school absences (numeric: from 0 to 93) 
 
-# Grades Observed in the Dataset: 
+#### Grades Observed in the Dataset: 
 31 G1 - first period grade (numeric: from 0 to 20) 
 
 31 G2 - second period grade (numeric: from 0 to 20) 
