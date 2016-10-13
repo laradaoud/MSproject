@@ -88,7 +88,8 @@ Text
 ```{r pressure, echo=FALSE}
 plot(pressure)
 ```
-m <- student.mat
+```{r}
+sm <- student.mat
 for (i in 16:24) {                                  
   sm[,i] <- as.character(sm[,i])
   for (j in 1:nrow(sm)) {
@@ -123,10 +124,13 @@ sm[,"Fedu"] <- abs(sm[,"Fedu"] - 6)
 sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
 sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
 
+```
+
+
 #---------------------------------------------------------------------
 
 #General test 
-
+```{r}
 t.test(sm[,"Walc"], sm[,"Dalc"])
 library(ggplot2)
 ggplot(data = sm) + geom_bar(aes(x=age))
@@ -138,9 +142,13 @@ i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of gender and age
 i <- ggplot(sm, aes(x = sm[,"Dalc"], y = sm[,"Walc"]))
 i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of Walc and Dalc
 
+```
+
+
 #Test and plot on gender and age
 
-#age
+###age
+```{r}
 f <- ggplot(data =sm, aes(x = sm[,"Dalc"], y = sm[,"age"]))
 f + geom_smooth(method = lm) #LABEL
 f <- ggplot(data =sm, aes(x = sm[,"Walc"], y = sm[,"age"]))
@@ -152,8 +160,11 @@ i <- ggplot(sm, aes(x = sm[,"absences"], y = sm[,"Walc"]))
 i + geom_bin2d(binwidth = c(1,1))
 cor.test(sm[,"age"],sm[,"Dalc"])
 cor.test(sm[,"age"],sm[,"Walc"])
-#gender
+```
 
+
+###gender
+```{r}
 for (i in 2) {                                  
   sm[,i] <- as.character(sm[,i])
   for (j in 1:nrow(sm)) {
@@ -164,57 +175,100 @@ for (i in 2) {
 }
 cor.test(sm[,"sex"],sm[,"Walc"])
 cor.test(sm[,"sex"],sm[,"Dalc"])
+```
 
 
-#Correlations tests 
-#As inputs have to be numeric it requires less lines to split the code that way instead of doing block per parameters analysed (Failures, paid, Medu, ... )
-#We could have done for loops here to calculate several correlations but it the results wasn't user friendly and doint it that way gave some useless correlations.
 
+
+##Correlations tests 
+As inputs have to be numeric it requires less lines to split the code that way instead of doing block per parameters analysed (Failures, paid, Medu, ... )
+We could have done for loops here to calculate several correlations but it the results wasn't user friendly and doint it that way gave some useless correlations.
+```{r}
 sm <- as.numeric(sm)
 sm1 <- subset(sm, sex == 1) #Create subsets with boys or girls
 sm1 <- subset(sm, sex == 0)
-#____ Romantic
+```
+
+###Romantic
+```{r}
 cor.test(sm[,"romantic"], sm[,"Dalc"])
 cor.test(sm[,"romantic"], sm[,"Walc"])
-#____absenses
+```
+
+###absenses
+```{r}
 cor.test(sm[,"absences"], sm[,"Dalc"])
 cor.test(sm[,"absences"], sm[,"Walc"])
-#____Failures
+```
+
+###Failures
+```{r}
 cor.test(sm[,"failures"], sm[,"Dalc"])
 cor.test(sm[,"failures"], sm[,"Walc"])
-#Boypart
+```
+
+###Boypart
+```{r}
 cor.test(sm1[,"failures"], sm1[,"Dalc"])
 cor.test(sm1[,"failures"], sm1[,"Walc"])
-#____Medu
+```
+
+###Medu
+```{r}
 cor.test(sm[,"Medu"], sm[,"Dalc"])
 cor.test(sm[,"Medu"], sm[,"Walc"])
-#____Fedu
+```
+
+###Fedu
+```{r}
 cor.test(sm[,"Fedu"], sm[,"Dalc"])
 cor.test(sm[,"Fedu"], sm[,"Walc"])
-#___Travel Time
+```
 
+###Travel Time
+```{r}
 cor.test(sm[,"traveltime"], sm[,"Dalc"])
 cor.test(sm[,"traveltime"], sm[,"Walc"])
-#___famrel
+```
+
+
+###famrel
+```{r}
 cor.test(sm[,"famrel"], sm[,"Dalc"])
 cor.test(sm[,"famrel"], sm[,"Walc"])
-#___goout
+```
 
+
+###goout
+```{r}
 cor.test(sm[,"goout"], sm[,"Dalc"])
 cor.test(sm[,"goout"], sm[,"Walc"])
-#___famsize
+```
+
+
+###famsize
+```{r}
 cor.test(sm[,"famsize"], sm[,"Dalc"])
 cor.test(sm[,"famsize"], sm[,"Walc"])
-#___internet
+```
 
+
+###internet
+```{r}
 cor.test(sm[,"internet"], sm[,"Dalc"])
 cor.test(sm[,"internet"], sm[,"Walc"])
-#famrel
+```
 
+
+###famrel
+```{r}
 cor.test(sm[,"famrel"], sm[,"Dalc"])
 cor.test(sm[,"famrel"], sm[,"Walc"])
-#___Grades
+```
 
+
+###Grades
+```{r}
 cor.test(sm[,"G1"], sm[,"Dalc"])
 cor.test(sm[,"G1"], sm[,"Walc"])
 cor.test(sm[,"G2"], sm[,"Dalc"])
@@ -224,40 +278,56 @@ cor.test(sm[,"G3"], sm[,"Walc"])
 cor.test(sm[,"G3"], sm[,"goout"])
 cor.test(sm[,"G3"], sm[,"failures"])
 cor.test(sm[,"G3"], sm[,"absences"])
+```
+
+
 
 #EARLY SIGNS OF ACADEMIC FAILURES
-#___abscences
-
+###abscences
+```{r}
 cor.test(sm[,"absences"], sm[,"Dalc"])
 cor.test(sm[,"absences"], sm[,"Walc"])
 cor.test(sm1[,"absences"], sm1[,"Dalc"])
 cor.test(sm1[,"absences"], sm1[,"Walc"])
 cor.test(sm2[,"absences"], sm2[,"Dalc"])
 cor.test(sm2[,"absences"], sm2[,"Walc"])
-#____Failures
+```
 
+
+###Failures
+```{r}
 cor.test(sm[,"failures"], sm[,"Dalc"])
 cor.test(sm[,"failures"], sm[,"Walc"])
 cor.test(sm1[,"failures"], sm1[,"Dalc"])
 cor.test(sm1[,"failures"], sm1[,"Walc"])
 cor.test(sm2[,"failures"], sm2[,"Dalc"])
 cor.test(sm2[,"failures"], sm2[,"Walc"])
-#___goout
+```
 
+
+###goout
+```{r}
 cor.test(sm[,"goout"], sm[,"Dalc"])
 cor.test(sm[,"goout"], sm[,"Walc"])
 cor.test(sm1[,"goout"], sm1[,"Dalc"])
 cor.test(sm1[,"goout"], sm1[,"Walc"])
 cor.test(sm2[,"goout"], sm2[,"Dalc"])
 cor.test(sm2[,"goout"], sm2[,"Walc"])
+```
 
 
+
+```{r}
 sm <- student.mat
 
 for (i in 1:32) {                                  
   sm[,i] <- as.factor(sm[,i])
 }
+```
 
+
+###remi text
+```{r}
 layout(matrix(1:14, ncol = 7))
 cdplot(sm[,"guardian"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Guardian", border = 1)
 cdplot(sm[,"guardian"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ", ylab = "Guardian", border = 1)
@@ -273,7 +343,11 @@ cdplot(sm[,"Mjob"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during 
 cdplot(sm[,"Mjob"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end")
 cdplot(sm[,"famrel"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days")
 cdplot(sm[,"famrel"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ")
+```
 
+
+###remi text
+```{r}
 layout(matrix(1:10, ncol = 5))
 cdplot(sm[,"romantic"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"romantic"] ~ sm[,"Walc"], data = sm)
@@ -285,22 +359,27 @@ cdplot(sm[,"activities"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"activities"] ~ sm[,"Walc"], data = sm)
 cdplot(sm[,"freetime"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"freetime"] ~ sm[,"Walc"], data = sm)
+```
 
-layout(matrix(1:10, ncol = 5))
+
+###remi text
+```{r}
+layout(matrix(1:8, ncol = 4))
 cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
 cdplot(sm[,"schoolsup"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"schoolsup"] ~ sm[,"Walc"], data = sm)
-#cdplot(sm[,"absences"] ~ sm[,"Dalc"], data = sm)
-#cdplot(sm[,"absences"] ~ sm[,"Walc"], data = sm) Make no sens
 cdplot(sm[,"studytime"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"studytime"] ~ sm[,"Walc"], data = sm)
 cdplot(sm[,"G3"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"G3"] ~ sm[,"Walc"], data = sm)
 
+```
 
-#Some regression
 
+
+##Some regression
+```{r}
 RegFails <- lm (Walc ~ failures, data = sm)
 summary (lm (Walc ~ failures, data = sm))
 libraryr(ggplot2)
@@ -316,6 +395,9 @@ sm2 <- subset(sm, Walc > 2 & Dalc > 2)
 layout(matrix(1:2, ncol = 2))
 cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
+```
+
+
 
 
 
@@ -323,8 +405,8 @@ cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
 
 
 #T
-#GoOUT
-
+###GoOUT
+```{r}
 sm[,"goout"] <- as.numeric(sm[,"goout"])
 sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
 sm[,"Walc"] <- as.numeric(sm[,"Walc"])
@@ -342,32 +424,43 @@ layout(matrix(1:2, ncol = 2))
 cdplot(sm[,"goout"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"goout"] ~ sm[,"Walc"], data = sm)
 
-#Internet
+```
 
+
+###Internet
+```{r}
 sm[,"internet"] <- as.numeric(sm[,"internet"])
 sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
 sm[,"Walc"] <- as.numeric(sm[,"Walc"])
 cor.test(sm[,"internet"], sm[,"Dalc"])
 cor.test(sm[,"internet"], sm[,"Walc"])
+```
 
-#Activities
 
+
+###Activities
+```{r}
 sm[,"activities"] <- as.numeric(sm[,"activities"])
 sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
 sm[,"Walc"] <- as.numeric(sm[,"Walc"])
 cor.test(sm[,"activities"], sm[,"Dalc"])
 cor.test(sm[,"activities"], sm[,"Walc"])
 
-#Freetime
+```
 
+
+###Freetime
+```{r}
 sm[,"freetime"] <- as.numeric(sm[,"freetime"])
 sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
 sm[,"Walc"] <- as.numeric(sm[,"Walc"])
 cor.test(sm[,"freetime"], sm[,"Dalc"])
 cor.test(sm[,"freetime"], sm[,"Walc"])
+```
 
 
 
+```{r}
 RegAbs <- lm (absences ~ Walc, data = sm)
 RegAbs
 library(ggplot2)
@@ -379,13 +472,20 @@ sm[,"Walc"] <- as.factor(sm[,"Walc"])
 layout(matrix(1:2, ncol = 2))
 cdplot(sm[,"absences"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"absences"] ~ sm[,"Walc"], data = sm)
+```
 
 
 
-#Mean tests
 
+
+
+##Mean tests
+```{r}
 mean(sm[sm[, "Fedu"] == "5", "Dalc"]) - mean(sm[sm[, "Medu"] == "5", "Dalc"])
 mean(sm[sm[, "guardian"] == "mother", "Dalc"]) - mean(sm[sm[, "guardian"] == "father", "Dalc"])
+
+```
+
 
 
 ## Hypothesis Testing
