@@ -63,12 +63,14 @@ if there is a high correlation among explanatory variables, then there is possib
 After performing the inspection and do the necessary action, we will continue with the regression and check the validity of the model.
 I. Distribution of Response Variable
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ggplot(sm) + geom_density(aes(x=Score)) + labs(x = "Academic Score", y="% Frequency", title = "Academic Score of Secondary School Student")
 ```
 From the graph, we can see that the distribution is slightly left-skewed. Generally, we would transform the variable to become more normally distributed. However, for the purpose of this project, we will not do any transfomation on the response variable and assume that the distribution is normal.
 
 II. Correlation between response variable and each explanatory variables
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
@@ -92,6 +94,7 @@ pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus",
 III. Correlation between response variable and each explanatory variables
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
@@ -114,7 +117,7 @@ pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus",
 
 
 ```{r setup, include=FALSE}
-
+knitr::opts_chunk$set(echo = TRUE)
 #2. derive variables
 
 # father or mother job is teacher = 1
@@ -147,7 +150,7 @@ pairs(sm[,c("G3","f_or_medu4")], lower.panel = panel.smooth, upper.panel = panel
 
 
 REGRESSION
-```{}
+```{echo=TRUE}
 
 # academic performance is measured by the average of exam scores
 sm[, "Score"] <- (sm[, "G1"] + sm[, "G2"] + sm[, "G3"])/3
