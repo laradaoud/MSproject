@@ -8,32 +8,35 @@ Data set source: P. Cortez and A. Silva. Using Data Mining to Predict Secondary 
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
+# Students' Alcohol Consumption Impacts on Academic Results on the Example of a Secondary Scool Maths Class in Portugal
 
 ---
 Content: 
 1. Introduction
 
-2. Dataset Description
+2. Dataset Description and Descriptive Statistics
 
-3. Descriptive Statistics
++ a. General Information
++ b. Family
++ c. Education 
++ d. Social Life and Health
++ e. Grades
 
-4. Correlation Analysis
+3. Hypothesis Testing
 
-5. Hypothesis Testing
+4. Correlation Analysis and Regression
 
-6. Regression 
+5. Interesting Findings 
 
-7. Conclusion
+6. Conclusion
 
-8. References
+7. References
 
-9. Appendices
----
+8. Appendices
 
-## Introduction 
+=======
 
-
+## 1. Introduction 
 Recent events in the world economy have lead to the decline in economic performance in many countries, amongst which is the decline of econommic growth in the European Union (EU).  As a response to these changes,  the EU has made it a priority to reverse this trend through investments that would provide new jobs and create a better educated workforce. Hence, the European Commission (EC) has set up a ‘Strategy for smart, sustainable and inclusive growth’ (European Comission, 2010), where a crucial part of investment is to contribute to the education of the next generations: The aim is to reduce the share of early school leavers to below 10% and ensure that at least 40% of the younger generation obtain a tertiary degree. 
 
 The implementation of this strategy would use up siginificant amounts of resources; therefore, ensuring its success is crucial.  However, some factors affect the effectiveness of this strategy by lowering the academic performance of students, despite the investments going into the education system.  In an effort to identify one of those factors, this paper looks into the effect of alcohol consumption on the academic performance of students.  The consequences of high alcohol consumption is a field with a vast amount of literature and scientific studies, all of which point to the health, social and economic effects of alcohol consumption.  For example, a study by Keng and Huffman (2010) has found a relationship between alcohol abuse and poor labor market outcomes.  The choice of alcohol consumption as hindering factor the success of the EC's strategy was therefore motivated to test whether these consequences extend to academic performance as well.
@@ -42,16 +45,14 @@ The dataset used for this paper contains information about students in Portugal 
 
 =======
 
-
-
-## Description of Dataset and Descriptive Statistics 
-
+## 2. Dataset Description and Descriptive Statistics 
 ```{r pressure, include=FALSE}
-sm <- read.csv("student-mat.csv", sep=';')
+# Read csv file
+sm <- read.csv("student-mat.csv", sep=';') 
 
 # Descriptive statistics
 library(ggplot2)
-
+library(gridExtra)
 
 meanAge <- mean(sm[,'age']) #16.696
 medianAge <- median(sm[,'age']) #17 
@@ -80,7 +81,7 @@ summary(sm[,'sex'])
 #F=208 #M=187
 
 df_gender <- data.frame(Gender=c("Female", "Male"), value=c(208, 187))
-pie_gender <- ggplot(data=df_sex, aes(x="", y=value, fill=Gender)) + 
+pie_gender <- ggplot(data=df_gender, aes(x="", y=value, fill=Gender)) + 
   geom_bar(width = 1, stat = "identity") + 
   coord_polar("y", start=0) + 
   scale_fill_brewer() + blank_theme + 
@@ -109,14 +110,15 @@ studyTime <- table(sm$studytime)
 #  1   2   3   4 
 # 105 198  65  27 
 
-df_studyTime <- data.frame(Study_Time=c('<2 hours', "2 to 5 hours", "5 to 10 hours", ">10 hours"), value=c(105, 198, 65, 27))
+df_studyTime <- data.frame(Hours=c('<2 hours', "2 to 5 hours", "5 to 10 hours", ">10 hours"), value=c(105, 198, 65, 27))
 #weekly study time (numeric: 1 - <2 hours, 2 - 2 to 5 hours, 3 - 5 to 10 hours, or 4 - >10 hours)
 
-bar_studytime <- ggplot(data=df_studyTime, aes(x="", y=value, fill=Study_Time)) + 
+bar_studytime <- ggplot(data=df_studyTime, aes(x="", y=value, fill=Hours)) + 
   geom_bar(width = 1, stat = "identity") + 
   scale_fill_brewer() + blank_theme + 
   theme(axis.text.x=element_blank()) +
-  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) +
+  ggtitle('Study Time')
 
 
 ###
@@ -144,7 +146,7 @@ summary(sm[,'school'])
 df_school <- data.frame(Schools=c("Gabriel Pereira", "Mousinho da Silveira"), value=c(349,46))
 bar_school <- ggplot(data=df_school, aes(x="", y=value, fill=Schools)) + 
   geom_bar(width = 1, stat = "identity") + 
-  blank_theme + 
+  scale_fill_brewer() + blank_theme +
   theme(axis.text.x=element_blank()) +
   geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
 
@@ -156,8 +158,8 @@ ggplot(data=sm) + geom_bar(aes((sm[,'Fjob']))) + labs(x="Father's Job")
 # at_home   health  other  services  teacher 
 #   20       18      217      111       29 
 
-df_fjob <- data.frame(Group = c("Health", "Work at Home", "Teacher", "Servies", "Other"), value = c(18, 20, 29, 111, 217))
-pie_fjob <- ggplot(data = df_fjob, aes(x="", y=value, fill=Group)) + 
+df_fjob <- data.frame(Job = c("Health", "Work at Home", "Teacher", "Servies", "Other"), value = c(18, 20, 29, 111, 217))
+pie_fjob <- ggplot(data = df_fjob, aes(x="", y=value, fill=Job)) + 
   geom_bar(width = 1, stat = "identity") + 
   coord_polar("y", start=0) + 
   scale_fill_brewer() + blank_theme +
@@ -173,8 +175,8 @@ ggplot(data=sm) + geom_bar(aes((sm[,'Mjob']))) + labs(x="Mother's Job")
 # at_home   health  other  services  teacher 
 # 59       34        141      103       58
 
-df_mjob <- data.frame(Group = c("Health", "Teacher", "Work at Home", "Services", "Other"), value = c(34, 58, 59, 103, 141))
-pie_mjob <- ggplot(data = df_mjob, aes(x="", y=value, fill=Group)) + 
+df_mjob <- data.frame(Job = c("Health", "Teacher", "Work at Home", "Services", "Other"), value = c(34, 58, 59, 103, 141))
+pie_mjob <- ggplot(data = df_mjob, aes(x="", y=value, fill=Job)) + 
   geom_bar(width = 1, stat = "identity") + 
   coord_polar("y", start=0) + 
   scale_fill_brewer() + blank_theme +
@@ -190,498 +192,101 @@ ggplot(data=sm) + geom_bar(aes(guardian)) + labs(x="Student's Guardian")
 # father mother  other 
 # 90    273     32 
 
-df_guardian <- data.frame(group = c("Father", "Mother", "Other"), value = c(90, 273, 32))
-pie_guardian <- ggplot(data = df_guardian, aes(x="", y=value, fill=group)) + 
+df_guardian <- data.frame(Type = c("Father", "Mother", "Other"), value = c(90, 273, 32))
+pie_guardian <- ggplot(data = df_guardian, aes(x="", y=value, fill=Type)) + 
   geom_bar(width = 1, stat = "identity") + 
   coord_polar("y", start=0) + 
   scale_fill_brewer() + blank_theme +
   theme(axis.text.x=element_blank()) +
   geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) +
   ggtitle("Guardian")
-
-
-###############################################################################################
-
 ```
 
 The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into five areas of information: 
 
-#### 1. General Information
+#### a. General Information
 General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. Out of the total of 395, there are 52.7% female and 47.3% male students. Most students would live in an urban environment, while approx. 20% live in an rural environment. 
-
 ```{r, echo=FALSE}
-pie_gender
-
-pie_address
+grid.arrange(pie_gender,pie_address, ncol=2)
 ```
 
-
-#### 2. Family  
+#### b. Family  
 Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian. 
-
 ```{r, echo=FALSE}
-pie_fjob
-
-pie_mjob
-
-pie_guardian
+grid.arrange(pie_fjob,pie_mjob,pie_guardian, ncol=3)
 ```
 
-
-#### 3. Education
-The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken, whether they have failed to pass any classes and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
-
+#### c. Education
+The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
 ```{r, echo=FALSE}
-bar_school
-bar_studytime
-
+grid.arrange(bar_school,bar_studytime, ncol=2)
 ```
 
+#### d. Social Life and Health 
+The social life section provieds information on activities the student is involved in outside of school. This includes how much leisure time they have, whether they are in a relationship and how often they go out. Moreover, there is data on how much alcohol students consume and in what health condition they are in. 
 
-#### 4. Social Life and Health 
-The social life section provieds information on activities the student is involved in outside of school. This includes 
-
-#### 5. Grades
-The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. 
+#### e. Grades
+The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. In addition, there is information on whether they have failed to pass any classes. 
 ```{r, echo=FALSE}
 pie_failures
-
 ```
 
+=======
 
-## Correlation Analysis
+## 3. Hypothesis Testing
 
-Text
+=======
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-```{r}
-sm <- student.mat
-for (i in 16:24) {                                  
-  sm[,i] <- as.character(sm[,i])
-  for (j in 1:nrow(sm)) {
-    if (sm[j,i] == "yes") sm[j,i] <- 1
-    if (sm[j,i] == "no") sm[j,i] <- 0
-  }
-  sm[,i] <- as.numeric(sm[,i])
-}
+## 4. Correlation Analysis and Regression
+In this report, we would like to find factors that are related to students academic performance. We will perform a multivariate regression analysis and use step-wise variable selection to find significant variables related to our response variable (academic performance - "Score"). Prior to the regression analysis, we want to get a general idea about the relationship between the variables. There are several things we want to inspect:
 
+a. Distribution of response variable
 
-for (i in 6) {                                  
-  sm[,i] <- as.character(sm[,i])
-  for (j in 1:nrow(sm)) {
-    if (sm[j,i] == "A") sm[j,i] <- 1
-    if (sm[j,i] == "T") sm[j,i] <- 0
-  }
-  sm[,i] <- as.numeric(sm[,i])
-}
-
-for (i in 5) {                                  
-  sm[,i] <- as.character(sm[,i])
-  for (j in 1:nrow(sm)) {
-    if (sm[j,i] == "GT3") sm[j,i] <- 1
-    if (sm[j,i] == "LE3") sm[j,i] <- 0
-  }
-  sm[,i] <- as.numeric(sm[,i])
-}
-
-
-sm[,"Medu"] <- abs(sm[,"Medu"] - 6)
-sm[,"Fedu"] <- abs(sm[,"Fedu"] - 6)
-sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
-sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
-
-```
-
-
-#---------------------------------------------------------------------
-
-#General test 
-```{r}
-t.test(sm[,"Walc"], sm[,"Dalc"])
-library(ggplot2)
-ggplot(data = sm) + geom_bar(aes(x=age))
-ggplot(data = sm) + geom_bar(aes(x=sex))
-ggplot(data = sm) + geom_bar(aes(x=Dalc))
-ggplot(data = sm) + geom_bar(aes(x=Walc))
-i <- ggplot(sm, aes(x = sm[,"age"], y = sm[,"sex"]))
-i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of gender and age
-i <- ggplot(sm, aes(x = sm[,"Dalc"], y = sm[,"Walc"]))
-i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of Walc and Dalc
-
-```
-
-
-#Test and plot on gender and age
-
-###age
-```{r}
-f <- ggplot(data =sm, aes(x = sm[,"Dalc"], y = sm[,"age"]))
-f + geom_smooth(method = lm) #LABEL
-f <- ggplot(data =sm, aes(x = sm[,"Walc"], y = sm[,"age"]))
-f + geom_density(method = lm)  #LABEL
-f + geom_smooth(na.rm = TRUE)
-i <- ggplot(sm, aes(x = sm[,"age"], y = sm[,"sex"]))
-i + geom_bin2d(binwidth = c(1,1))
-i <- ggplot(sm, aes(x = sm[,"absences"], y = sm[,"Walc"]))
-i + geom_bin2d(binwidth = c(1,1))
-cor.test(sm[,"age"],sm[,"Dalc"])
-cor.test(sm[,"age"],sm[,"Walc"])
-```
-
-
-###gender
-```{r}
-for (i in 2) {                                  
-  sm[,i] <- as.character(sm[,i])
-  for (j in 1:nrow(sm)) {
-    if (sm[j,i] == "M") sm[j,i] <- 1
-    if (sm[j,i] == "F") sm[j,i] <- 0
-  }
-  sm[,i] <- as.numeric(sm[,i])
-}
-cor.test(sm[,"sex"],sm[,"Walc"])
-cor.test(sm[,"sex"],sm[,"Dalc"])
-```
-
-
-
-
-##Correlations tests 
-As inputs have to be numeric it requires less lines to split the code that way instead of doing block per parameters analysed (Failures, paid, Medu, ... )
-We could have done for loops here to calculate several correlations but it the results wasn't user friendly and doint it that way gave some useless correlations.
-```{r}
-sm <- as.numeric(sm)
-sm1 <- subset(sm, sex == 1) #Create subsets with boys or girls
-sm1 <- subset(sm, sex == 0)
-```
-
-###Romantic
-```{r}
-cor.test(sm[,"romantic"], sm[,"Dalc"])
-cor.test(sm[,"romantic"], sm[,"Walc"])
-```
-
-###absenses
-```{r}
-cor.test(sm[,"absences"], sm[,"Dalc"])
-cor.test(sm[,"absences"], sm[,"Walc"])
-```
-
-###Failures
-```{r}
-cor.test(sm[,"failures"], sm[,"Dalc"])
-cor.test(sm[,"failures"], sm[,"Walc"])
-```
-
-###Boypart
-```{r}
-cor.test(sm1[,"failures"], sm1[,"Dalc"])
-cor.test(sm1[,"failures"], sm1[,"Walc"])
-```
-
-###Medu
-```{r}
-cor.test(sm[,"Medu"], sm[,"Dalc"])
-cor.test(sm[,"Medu"], sm[,"Walc"])
-```
-
-###Fedu
-```{r}
-cor.test(sm[,"Fedu"], sm[,"Dalc"])
-cor.test(sm[,"Fedu"], sm[,"Walc"])
-```
-
-###Travel Time
-```{r}
-cor.test(sm[,"traveltime"], sm[,"Dalc"])
-cor.test(sm[,"traveltime"], sm[,"Walc"])
-```
-
-
-###famrel
-```{r}
-cor.test(sm[,"famrel"], sm[,"Dalc"])
-cor.test(sm[,"famrel"], sm[,"Walc"])
-```
-
-
-###goout
-```{r}
-cor.test(sm[,"goout"], sm[,"Dalc"])
-cor.test(sm[,"goout"], sm[,"Walc"])
-```
-
-
-###famsize
-```{r}
-cor.test(sm[,"famsize"], sm[,"Dalc"])
-cor.test(sm[,"famsize"], sm[,"Walc"])
-```
-
-
-###internet
-```{r}
-cor.test(sm[,"internet"], sm[,"Dalc"])
-cor.test(sm[,"internet"], sm[,"Walc"])
-```
-
-
-###famrel
-```{r}
-cor.test(sm[,"famrel"], sm[,"Dalc"])
-cor.test(sm[,"famrel"], sm[,"Walc"])
-```
-
-
-###Grades
-```{r}
-cor.test(sm[,"G1"], sm[,"Dalc"])
-cor.test(sm[,"G1"], sm[,"Walc"])
-cor.test(sm[,"G2"], sm[,"Dalc"])
-cor.test(sm[,"G2"], sm[,"Walc"])
-cor.test(sm[,"G3"], sm[,"Dalc"])
-cor.test(sm[,"G3"], sm[,"Walc"])
-cor.test(sm[,"G3"], sm[,"goout"])
-cor.test(sm[,"G3"], sm[,"failures"])
-cor.test(sm[,"G3"], sm[,"absences"])
-```
-
-
-
-#EARLY SIGNS OF ACADEMIC FAILURES
-###abscences
-```{r}
-cor.test(sm[,"absences"], sm[,"Dalc"])
-cor.test(sm[,"absences"], sm[,"Walc"])
-cor.test(sm1[,"absences"], sm1[,"Dalc"])
-cor.test(sm1[,"absences"], sm1[,"Walc"])
-cor.test(sm2[,"absences"], sm2[,"Dalc"])
-cor.test(sm2[,"absences"], sm2[,"Walc"])
-```
-
-
-###Failures
-```{r}
-cor.test(sm[,"failures"], sm[,"Dalc"])
-cor.test(sm[,"failures"], sm[,"Walc"])
-cor.test(sm1[,"failures"], sm1[,"Dalc"])
-cor.test(sm1[,"failures"], sm1[,"Walc"])
-cor.test(sm2[,"failures"], sm2[,"Dalc"])
-cor.test(sm2[,"failures"], sm2[,"Walc"])
-```
-
-
-###goout
-```{r}
-cor.test(sm[,"goout"], sm[,"Dalc"])
-cor.test(sm[,"goout"], sm[,"Walc"])
-cor.test(sm1[,"goout"], sm1[,"Dalc"])
-cor.test(sm1[,"goout"], sm1[,"Walc"])
-cor.test(sm2[,"goout"], sm2[,"Dalc"])
-cor.test(sm2[,"goout"], sm2[,"Walc"])
-```
-
-
-
-```{r}
-sm <- student.mat
-
-for (i in 1:32) {                                  
-  sm[,i] <- as.factor(sm[,i])
-}
-```
-
-
-###remi text
-```{r}
-layout(matrix(1:14, ncol = 7))
-cdplot(sm[,"guardian"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Guardian", border = 1)
-cdplot(sm[,"guardian"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ", ylab = "Guardian", border = 1)
-cdplot(sm[,"Medu"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Father's education", border = 1)
-cdplot(sm[,"Medu"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ", ylab = "Father's education", border = 1)
-cdplot(sm[,"Fedu"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Mother's education", border = 1)
-cdplot(sm[,"Fedu"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ", ylab = "Mother's education", border = 1)
-cdplot(sm[,"Pstatus"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ")
-cdplot(sm[,"Pstatus"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ")
-cdplot(sm[,"famsize"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ")
-cdplot(sm[,"famsize"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ")
-cdplot(sm[,"Mjob"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days")
-cdplot(sm[,"Mjob"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end")
-cdplot(sm[,"famrel"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days")
-cdplot(sm[,"famrel"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ")
-```
-
-
-###remi text
-```{r}
-layout(matrix(1:10, ncol = 5))
-cdplot(sm[,"romantic"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"romantic"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"goout"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"goout"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"internet"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"internet"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"activities"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"activities"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"freetime"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"freetime"] ~ sm[,"Walc"], data = sm)
-```
-
-
-###remi text
-```{r}
-layout(matrix(1:8, ncol = 4))
-cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"schoolsup"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"schoolsup"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"studytime"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"studytime"] ~ sm[,"Walc"], data = sm)
-cdplot(sm[,"G3"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"G3"] ~ sm[,"Walc"], data = sm)
-
-```
-
-
-
-##Some regression
-```{r}
-RegFails <- lm (Walc ~ failures, data = sm)
-summary (lm (Walc ~ failures, data = sm))
-libraryr(ggplot2)
-f <- ggplot(data =sm, aes(x = sm[,"Walc"], y = sm[,"failures"]))
-f + geom_smooth(method = lm)
-libraryr(ggplot2)
-f <- ggplot(data =sm, aes(x = sm[,"Dalc"], y = sm[,"failures"]))
-f + geom_smooth(method = lm)
-
-sm1 <- subset(sm, Walc < 3 & Dalc <3)
-sm2 <- subset(sm, Walc > 2 & Dalc > 2)
-
-layout(matrix(1:2, ncol = 2))
-cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
-```
-
-
-#T
-###GoOUT
-```{r}
-sm[,"goout"] <- as.numeric(sm[,"goout"])
-sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
-sm[,"Walc"] <- as.numeric(sm[,"Walc"])
-cor.test(sm[,"goout"], sm[,"Dalc"])
-cor.test(sm[,"goout"], sm[,"Walc"]) #Stong correlation
-RegGoout <- lm (goout ~ Walc, data = sm)
-RegGoout
-libraryr(ggplot2)
-f <- ggplot(data =sm, aes(x = sm[,"goout"], y = sm[,"Walc"]))
-f + geom_smooth(method = lm) #TBS
-sm[,"goout"] <- as.factor(sm[,"goout"])
-sm[,"Dalc"] <- as.factor(sm[,"Dalc"])
-sm[,"Walc"] <- as.factor(sm[,"Walc"])
-layout(matrix(1:2, ncol = 2))
-cdplot(sm[,"goout"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"goout"] ~ sm[,"Walc"], data = sm)
-
-```
-
-
-###Internet
-```{r}
-sm[,"internet"] <- as.numeric(sm[,"internet"])
-sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
-sm[,"Walc"] <- as.numeric(sm[,"Walc"])
-cor.test(sm[,"internet"], sm[,"Dalc"])
-cor.test(sm[,"internet"], sm[,"Walc"])
-```
-
-
-
-###Activities
-```{r}
-sm[,"activities"] <- as.numeric(sm[,"activities"])
-sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
-sm[,"Walc"] <- as.numeric(sm[,"Walc"])
-cor.test(sm[,"activities"], sm[,"Dalc"])
-cor.test(sm[,"activities"], sm[,"Walc"])
-
-```
-
-
-###Freetime
-```{r}
-sm[,"freetime"] <- as.numeric(sm[,"freetime"])
-sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
-sm[,"Walc"] <- as.numeric(sm[,"Walc"])
-cor.test(sm[,"freetime"], sm[,"Dalc"])
-cor.test(sm[,"freetime"], sm[,"Walc"])
-```
-
-
-
-```{r}
-RegAbs <- lm (absences ~ Walc, data = sm)
-RegAbs
-library(ggplot2)
-f <- ggplot(data =sm, aes(x = Walc, y = absences))
-f + geom_smooth(method = lm) #TBS
-sm[,"absences"] <- as.factor(sm[,"absences"])
-sm[,"Dalc"] <- as.factor(sm[,"Dalc"])
-sm[,"Walc"] <- as.factor(sm[,"Walc"])
-layout(matrix(1:2, ncol = 2))
-cdplot(sm[,"absences"] ~ sm[,"Dalc"], data = sm)
-cdplot(sm[,"absences"] ~ sm[,"Walc"], data = sm)
-```
-
-
-
-
-
-
-##Mean tests
-```{r}
-mean(sm[sm[, "Fedu"] == "5", "Dalc"]) - mean(sm[sm[, "Medu"] == "5", "Dalc"])
-mean(sm[sm[, "guardian"] == "mother", "Dalc"]) - mean(sm[sm[, "guardian"] == "father", "Dalc"])
-
-```
-
-
-
-## Hypothesis Testing
-
-Text
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-## Correlation and Regression
-
-In this report, we would like to find factors that are related to students academic performance. We will perform a multivariate regression analysis and use step-wise variable selection to find significant variables related to our response variable (academic performance - "Score"). Prior to the regression analysis, we want to get a general idea about the relationship between the variables. There are several things we want to inspect :
-
-1) Distribution of response variable
 if there is skewness in the distribution, we should consider transforming the variable (i.e logarithmic)
 
-2) Correlation between response variable and each explanatory variables
+b. Correlation between response variable and each explanatory variables
 
-3) Correlation among explanatory variables
+c. Correlation among explanatory variables
+
 if there is a high correlation among explanatory variables, then there is possible multicollinearity problem
 
 After performing the inspection and do the necessary action, we will continue with the regression and check the validity of the model.
 
-I. Distribution of Response Variable
+### a. Distribution of Response Variable
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+
+sm[,"Score"] <- (sm[,"G1"] + sm[,"G2"] + sm[,"G3"])/3
+
 ggplot(sm) + geom_density(aes(x=Score)) + labs(x = "Academic Score", y="% Frequency", title = "Academic Score of Secondary School Student")
 ```
 From the graph, we can see that the distribution is slightly left-skewed. Generally, we would transform the variable to become more normally distributed. However, for the purpose of this project, we will not do any transfomation on the response variable and assume that the distribution is normal.
 
-II. Correlation between response variable and each explanatory variables
+### b. Correlation between response variable and each explanatory variables
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
+            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
+            "schoolsup","famsup","paid","activities","nursery","higher","internet",
+            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
+      lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+### c. Correlation between response variable and each explanatory variables
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
 {
   usr <- par("usr"); on.exit(par(usr))
@@ -701,32 +306,8 @@ pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus",
 ```
 
 
-III. Correlation between response variable and each explanatory variables
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
-{
-  usr <- par("usr"); on.exit(par(usr))
-  par(usr = c(0, 1, 0, 1))
-  r <- abs(cor(x, y))
-  txt <- format(c(r, 0.123456789), digits = digits)[1]
-  txt <- paste0(prefix, txt)
-  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
-  text(0.5, 0.5, txt, cex = cex.cor * r)
-}
-
-pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
-            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
-            "schoolsup","famsup","paid","activities","nursery","higher","internet",
-            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
-      lower.panel = panel.smooth, upper.panel = panel.cor)
-```
-
-
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 #2. derive variables
 
 # father or mother job is teacher = 1
@@ -759,7 +340,6 @@ pairs(sm[,c("G3","f_or_medu4")], lower.panel = panel.smooth, upper.panel = panel
 
 
 ### Regression
-
 ```{echo=TRUE}
 
 # academic performance is measured by the average of exam scores
@@ -835,11 +415,9 @@ step <- stepAIC(reg, direction="both")
 
 library(stargazer)
 stargazer(reg24, type = "text", digits = 2)
-
 ```
 
 ```{}
-
 # residual plot
 fit_res <-  data.frame(sm, fitted.value = fitted(reg24), residual = resid(reg24))
 
@@ -870,14 +448,379 @@ However, statistically, the model itself does not explain academic score very we
 there are other significant factors not available in the dataset that we think can explain score better. for example, IQ and EQ score, nutrition, or time spent for physical exercise.
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+
+
+
+
+
+
+
+
+```{r}
+sm <- student.mat
+for (i in 16:24) {                                  
+  sm[,i] <- as.character(sm[,i])
+  for (j in 1:nrow(sm)) {
+    if (sm[j,i] == "yes") sm[j,i] <- 1
+    if (sm[j,i] == "no") sm[j,i] <- 0
+  }
+  sm[,i] <- as.numeric(sm[,i])
+}
+
+
+for (i in 6) {                                  
+  sm[,i] <- as.character(sm[,i])
+  for (j in 1:nrow(sm)) {
+    if (sm[j,i] == "A") sm[j,i] <- 1
+    if (sm[j,i] == "T") sm[j,i] <- 0
+  }
+  sm[,i] <- as.numeric(sm[,i])
+}
+
+for (i in 5) {                                  
+  sm[,i] <- as.character(sm[,i])
+  for (j in 1:nrow(sm)) {
+    if (sm[j,i] == "GT3") sm[j,i] <- 1
+    if (sm[j,i] == "LE3") sm[j,i] <- 0
+  }
+  sm[,i] <- as.numeric(sm[,i])
+}
+
+
+sm[,"Medu"] <- abs(sm[,"Medu"] - 6)
+sm[,"Fedu"] <- abs(sm[,"Fedu"] - 6)
+sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
+sm[,"famrel"] <- abs(sm[,"famrel"] - 6)
+
 ```
 
-## Conclusion
+
+#---------------------------------------------------------------------
+
+# General test 
+```{r}
+t.test(sm[,"Walc"], sm[,"Dalc"])
+library(ggplot2)
+ggplot(data = sm) + geom_bar(aes(x=age))
+ggplot(data = sm) + geom_bar(aes(x=sex))
+ggplot(data = sm) + geom_bar(aes(x=Dalc))
+ggplot(data = sm) + geom_bar(aes(x=Walc))
+i <- ggplot(sm, aes(x = sm[,"age"], y = sm[,"sex"]))
+i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of gender and age
+i <- ggplot(sm, aes(x = sm[,"Dalc"], y = sm[,"Walc"]))
+i + geom_bin2d(binwidth = c(1,1)) #LABEL #Distribution of Walc and Dalc
+```
+
+## Test and plot on gender and age
+### age
+```{r}
+f <- ggplot(data =sm, aes(x = sm[,"Dalc"], y = sm[,"age"]))
+f + geom_smooth(method = lm) #LABEL
+f <- ggplot(data =sm, aes(x = sm[,"Walc"], y = sm[,"age"]))
+f + geom_density(method = lm)  #LABEL
+f + geom_smooth(na.rm = TRUE)
+i <- ggplot(sm, aes(x = sm[,"age"], y = sm[,"sex"]))
+i + geom_bin2d(binwidth = c(1,1))
+i <- ggplot(sm, aes(x = sm[,"absences"], y = sm[,"Walc"]))
+i + geom_bin2d(binwidth = c(1,1))
+cor.test(sm[,"age"],sm[,"Dalc"])
+cor.test(sm[,"age"],sm[,"Walc"])
+```
+
+### gender
+```{r}
+for (i in 2) {                                  
+  sm[,i] <- as.character(sm[,i])
+  for (j in 1:nrow(sm)) {
+    if (sm[j,i] == "M") sm[j,i] <- 1
+    if (sm[j,i] == "F") sm[j,i] <- 0
+  }
+  sm[,i] <- as.numeric(sm[,i])
+}
+cor.test(sm[,"sex"],sm[,"Walc"])
+cor.test(sm[,"sex"],sm[,"Dalc"])
+```
+
+## Correlations tests 
+As inputs have to be numeric it requires less lines to split the code that way instead of doing block per parameters analysed (Failures, paid, Medu, ... )
+We could have done for loops here to calculate several correlations but it the results wasn't user friendly and doint it that way gave some useless correlations.
+```{r}
+sm <- as.numeric(sm)
+sm1 <- subset(sm, sex == 1) #Create subsets with boys or girls
+sm1 <- subset(sm, sex == 0)
+```
+
+### Romantic
+```{r}
+cor.test(sm[,"romantic"], sm[,"Dalc"])
+cor.test(sm[,"romantic"], sm[,"Walc"])
+```
+
+### absenses
+```{r}
+cor.test(sm[,"absences"], sm[,"Dalc"])
+cor.test(sm[,"absences"], sm[,"Walc"])
+```
+
+### Failures
+```{r}
+cor.test(sm[,"failures"], sm[,"Dalc"])
+cor.test(sm[,"failures"], sm[,"Walc"])
+```
+
+### Boypart
+```{r}
+cor.test(sm1[,"failures"], sm1[,"Dalc"])
+cor.test(sm1[,"failures"], sm1[,"Walc"])
+```
+
+### Medu
+```{r}
+cor.test(sm[,"Medu"], sm[,"Dalc"])
+cor.test(sm[,"Medu"], sm[,"Walc"])
+```
+
+### Fedu
+```{r}
+cor.test(sm[,"Fedu"], sm[,"Dalc"])
+cor.test(sm[,"Fedu"], sm[,"Walc"])
+```
+
+### Travel Time
+```{r}
+cor.test(sm[,"traveltime"], sm[,"Dalc"])
+cor.test(sm[,"traveltime"], sm[,"Walc"])
+```
+
+### famrel
+```{r}
+cor.test(sm[,"famrel"], sm[,"Dalc"])
+cor.test(sm[,"famrel"], sm[,"Walc"])
+```
+
+### goout
+```{r}
+cor.test(sm[,"goout"], sm[,"Dalc"])
+cor.test(sm[,"goout"], sm[,"Walc"])
+```
+
+###famsize
+```{r}
+cor.test(sm[,"famsize"], sm[,"Dalc"])
+cor.test(sm[,"famsize"], sm[,"Walc"])
+```
+
+### internet
+```{r}
+cor.test(sm[,"internet"], sm[,"Dalc"])
+cor.test(sm[,"internet"], sm[,"Walc"])
+```
+
+### famrel
+```{r}
+cor.test(sm[,"famrel"], sm[,"Dalc"])
+cor.test(sm[,"famrel"], sm[,"Walc"])
+```
+
+### Grades
+```{r}
+cor.test(sm[,"G1"], sm[,"Dalc"])
+cor.test(sm[,"G1"], sm[,"Walc"])
+cor.test(sm[,"G2"], sm[,"Dalc"])
+cor.test(sm[,"G2"], sm[,"Walc"])
+cor.test(sm[,"G3"], sm[,"Dalc"])
+cor.test(sm[,"G3"], sm[,"Walc"])
+cor.test(sm[,"G3"], sm[,"goout"])
+cor.test(sm[,"G3"], sm[,"failures"])
+cor.test(sm[,"G3"], sm[,"absences"])
+```
+
+## Early Signs of Academic Failures 
+### abscences
+```{r}
+cor.test(sm[,"absences"], sm[,"Dalc"])
+cor.test(sm[,"absences"], sm[,"Walc"])
+cor.test(sm1[,"absences"], sm1[,"Dalc"])
+cor.test(sm1[,"absences"], sm1[,"Walc"])
+cor.test(sm2[,"absences"], sm2[,"Dalc"])
+cor.test(sm2[,"absences"], sm2[,"Walc"])
+```
+
+### Failures
+```{r}
+cor.test(sm[,"failures"], sm[,"Dalc"])
+cor.test(sm[,"failures"], sm[,"Walc"])
+cor.test(sm1[,"failures"], sm1[,"Dalc"])
+cor.test(sm1[,"failures"], sm1[,"Walc"])
+cor.test(sm2[,"failures"], sm2[,"Dalc"])
+cor.test(sm2[,"failures"], sm2[,"Walc"])
+```
+
+### goout
+```{r}
+cor.test(sm[,"goout"], sm[,"Dalc"])
+cor.test(sm[,"goout"], sm[,"Walc"])
+cor.test(sm1[,"goout"], sm1[,"Dalc"])
+cor.test(sm1[,"goout"], sm1[,"Walc"])
+cor.test(sm2[,"goout"], sm2[,"Dalc"])
+cor.test(sm2[,"goout"], sm2[,"Walc"])
+```
+
+```{r}
+sm <- student.mat
+
+for (i in 1:32) {                                  
+  sm[,i] <- as.factor(sm[,i])
+}
+```
+
+### remi text
+```{r}
+layout(matrix(1:14, ncol = 7))
+cdplot(sm[,"guardian"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Guardian", border = 1)
+cdplot(sm[,"guardian"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ", ylab = "Guardian", border = 1)
+cdplot(sm[,"Medu"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Father's education", border = 1)
+cdplot(sm[,"Medu"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ", ylab = "Father's education", border = 1)
+cdplot(sm[,"Fedu"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ", ylab = "Mother's education", border = 1)
+cdplot(sm[,"Fedu"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ", ylab = "Mother's education", border = 1)
+cdplot(sm[,"Pstatus"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ")
+cdplot(sm[,"Pstatus"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during Week-end ")
+cdplot(sm[,"famsize"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days ")
+cdplot(sm[,"famsize"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ")
+cdplot(sm[,"Mjob"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days")
+cdplot(sm[,"Mjob"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end")
+cdplot(sm[,"famrel"] ~ sm[,"Dalc"], data = sm, xlab = "Alcohol consumption during working days")
+cdplot(sm[,"famrel"] ~ sm[,"Walc"], data = sm, xlab = "Alcohol consumption during working Week-end ")
+```
+
+### remi text
+```{r}
+layout(matrix(1:10, ncol = 5))
+cdplot(sm[,"romantic"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"romantic"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"goout"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"goout"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"internet"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"internet"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"activities"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"activities"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"freetime"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"freetime"] ~ sm[,"Walc"], data = sm)
+```
+
+### remi text
+```{r}
+layout(matrix(1:8, ncol = 4))
+cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"schoolsup"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"schoolsup"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"studytime"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"studytime"] ~ sm[,"Walc"], data = sm)
+cdplot(sm[,"G3"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"G3"] ~ sm[,"Walc"], data = sm)
+
+```
+
+##Some regression
+```{r}
+RegFails <- lm (Walc ~ failures, data = sm)
+summary (lm (Walc ~ failures, data = sm))
+libraryr(ggplot2)
+f <- ggplot(data =sm, aes(x = sm[,"Walc"], y = sm[,"failures"]))
+f + geom_smooth(method = lm)
+libraryr(ggplot2)
+f <- ggplot(data =sm, aes(x = sm[,"Dalc"], y = sm[,"failures"]))
+f + geom_smooth(method = lm)
+
+sm1 <- subset(sm, Walc < 3 & Dalc <3)
+sm2 <- subset(sm, Walc > 2 & Dalc > 2)
+
+layout(matrix(1:2, ncol = 2))
+cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
+```
+
+#T
+### GoOUT
+```{r}
+sm[,"goout"] <- as.numeric(sm[,"goout"])
+sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
+sm[,"Walc"] <- as.numeric(sm[,"Walc"])
+cor.test(sm[,"goout"], sm[,"Dalc"])
+cor.test(sm[,"goout"], sm[,"Walc"]) #Stong correlation
+RegGoout <- lm (goout ~ Walc, data = sm)
+RegGoout
+libraryr(ggplot2)
+f <- ggplot(data =sm, aes(x = sm[,"goout"], y = sm[,"Walc"]))
+f + geom_smooth(method = lm) #TBS
+sm[,"goout"] <- as.factor(sm[,"goout"])
+sm[,"Dalc"] <- as.factor(sm[,"Dalc"])
+sm[,"Walc"] <- as.factor(sm[,"Walc"])
+layout(matrix(1:2, ncol = 2))
+cdplot(sm[,"goout"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"goout"] ~ sm[,"Walc"], data = sm)
+
+```
+
+### Internet
+```{r}
+sm[,"internet"] <- as.numeric(sm[,"internet"])
+sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
+sm[,"Walc"] <- as.numeric(sm[,"Walc"])
+cor.test(sm[,"internet"], sm[,"Dalc"])
+cor.test(sm[,"internet"], sm[,"Walc"])
+```
+
+### Activities
+```{r}
+sm[,"activities"] <- as.numeric(sm[,"activities"])
+sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
+sm[,"Walc"] <- as.numeric(sm[,"Walc"])
+cor.test(sm[,"activities"], sm[,"Dalc"])
+cor.test(sm[,"activities"], sm[,"Walc"])
+
+```
+
+### Freetime
+```{r}
+sm[,"freetime"] <- as.numeric(sm[,"freetime"])
+sm[,"Dalc"] <- as.numeric(sm[,"Dalc"])
+sm[,"Walc"] <- as.numeric(sm[,"Walc"])
+cor.test(sm[,"freetime"], sm[,"Dalc"])
+cor.test(sm[,"freetime"], sm[,"Walc"])
+```
 
 
-## References
+```{r}
+RegAbs <- lm (absences ~ Walc, data = sm)
+RegAbs
+library(ggplot2)
+f <- ggplot(data =sm, aes(x = Walc, y = absences))
+f + geom_smooth(method = lm) #TBS
+sm[,"absences"] <- as.factor(sm[,"absences"])
+sm[,"Dalc"] <- as.factor(sm[,"Dalc"])
+sm[,"Walc"] <- as.factor(sm[,"Walc"])
+layout(matrix(1:2, ncol = 2))
+cdplot(sm[,"absences"] ~ sm[,"Dalc"], data = sm)
+cdplot(sm[,"absences"] ~ sm[,"Walc"], data = sm)
+```
+
+### Mean tests
+```{r}
+mean(sm[sm[, "Fedu"] == "5", "Dalc"]) - mean(sm[sm[, "Medu"] == "5", "Dalc"])
+mean(sm[sm[, "guardian"] == "mother", "Dalc"]) - mean(sm[sm[, "guardian"] == "father", "Dalc"])
+
+```
+
+## Hypothesis Testing
+
+
+## 7. Conclusion
+
+
+## 8. References
 European Commission (2010). Europe 2020 – A Strategy for smart, sustainable and inclusive growth. [online] Available at: http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=COM:2010:2020:FIN:EN:PDF [Accessed: 11.10.2016]
 
 
