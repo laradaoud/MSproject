@@ -9,60 +9,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
-# Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
-
----
-Content: 
-1. Introduction
-2. Dataset Description
-3. Descriptive Statistics
-4. Correlation Analysis
-5. Hypothesis Testing
-6. Regression 
-7. Conclusion
-8. References
-9. Appendices
----
+## Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
 
 ## Introduction 
 
-
-Recent events in the world economy have lead to the decline in economic performance in many countries, amongst which is the decline of econommic growth in the European Union (EU).  As a response to these changes,  the EU has made it a priority to reverse this trend through investments that would provide new jobs and create a better educated workforce. Hence, the European Comission (EC) has set up a ‘Strategy for smart, sustainable and inclusive growth’ (European Comission, 2010), where a crucial part of investment is to contribute to the education of the next generations: The aim is to reduce the share of early school leavers to below 10% and ensure that at least 40% of the younger generation obtain a tertiary degree. 
-
-The implementation of this strategy would use up siginificant amounts of resources; therefore, ensuring its success is crucial.  However, some factors affect the effectiveness of this strategy by lowering the academic performance of students, despite the investments going into the education system.  In an effort to identify one of those factors, this paper looks into the effect of alcohol consumption on the academic performance of students.  The consequences of high alcohol consumption is a field with a vast amount of literature and scientific studies, all of which point to the health, social and economic effects of alcohol consumption.  For example, a study by Keng and Huffman (2010) has found a relationship between alcohol abuse and poor labor market outcomes.  The choice of alcohol consumption as hindering factor the success of the EC's strategy was therefore motivated to test whether these consequences extend to academic performance as well.
-
-The dataset used for this paper contains information about students in Portugal at the secondary school level. Portugal is among the world's highest alcohol consuming countries worldwide, ranked as the tenth highest alcohol consuming country per capita (Statitsa, 2016). In addition, Portugal is ranked amongst the top five OECD countries with the largest percentage of adults who have not attained secondary education in 2013, with a high percentage of 65% compared to an OECD average of 25%.  This is coupled with the fact that unemployment affected adults without a secondary education more severely than it did those with tertiary education (OECD, 2013). 
-
-=======
-
+After the last financial crisis, the European Union has recognised that investments are required in order to reverse the latest trends in economic growth decline by creating new jobs and a better educated workforce. Hence, the European Comission has set up a ‘Strategy for smart, sustainable and inclusive growth’ (European Comission, 2010), where a crucial part of investment is to contribute to the education of the next generations: The aim is to reduce the share of early school leavers to below 10% and ensure that at least 40% of the younger generation obtain a tertiary degree. In the following, the current educational condition in Europe will be investigated and an examplary deeper analysis on one of the greater affected countries, Portugal, will be provided in order to gain an understanding of factors influencing the academic achievements in secondary school, which are crucial for students to enter tertiary education and subsequently performing well in their working career. 
 
 
 ## Description of Dataset
 
 ```{r pressure, echo=FALSE}
 sm <- read.csv("student-mat.csv", sep=';')
-str(sm)
+
 summary(sm[,"age"])
 ```
 
-The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into six areas of information: 
+The data set examined provides sample data of two secondary schools in Portugal. The ages of students varies from 15 to 22 years with an average of 16.7 years. 
 
-#### 1. General Information
-General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. The split between male and female students is .....and most student would live in an urban environment (.....), while % live in an rural environment. 
-
-#### 2. Family  
-Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian. 
-
-#### 3. Education
-The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken, whether they have failed to pass any classes and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
-
-#### 4. Social Life  
-The social life section provieds information on activities the student is involved in outside of school. This includes
-
-#### 5. Health 
-
-#### 6. Grades
-The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. 
 
 ## Descriptive Statistics 
 
@@ -90,7 +53,201 @@ plot(pressure)
 
 ## Regression
 
-Text
+In this report, we would like to find factors that are related to students academic performance. We will perform a multivariate regression analysis and use step-wise variable selection to find significant variables related to our response variable (academic performance - "Score"). Prior to the regression analysis, we want to get a general idea about the relationship between the variables. There are several things we want to inspect :
+1) Distribution of response variable
+if there is skewness in the distribution, we should consider transforming the variable (i.e logarithmic)
+2) Correlation between response variable and each explanatory variables
+3) Correlation among explanatory variables
+if there is a high correlation among explanatory variables, then there is possible multicollinearity problem
+
+After performing the inspection and do the necessary action, we will continue with the regression and check the validity of the model.
+I. Distribution of Response Variable
+```{r setup, include=FALSE}
+ggplot(sm) + geom_density(aes(x=Score)) + labs(x = "Academic Score", y="% Frequency", title = "Academic Score of Secondary School Student")
+```
+From the graph, we can see that the distribution is slightly left-skewed. Generally, we would transform the variable to become more normally distributed. However, for the purpose of this project, we will not do any transfomation on the response variable and assume that the distribution is normal.
+
+II. Correlation between response variable and each explanatory variables
+```{r setup, include=FALSE}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
+            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
+            "schoolsup","famsup","paid","activities","nursery","higher","internet",
+            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
+      lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+(remi's part)
+
+III. Correlation between response variable and each explanatory variables
+
+```{r setup, include=FALSE}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
+            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
+            "schoolsup","famsup","paid","activities","nursery","higher","internet",
+            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
+      lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+(remi's part)
+
+
+```{r setup, include=FALSE}
+
+#2. derive variables
+
+# father or mother job is teacher = 1
+sm$f_or_mteach <- 0
+sm[j,"f_or_mteach"] <- as.character(sm[,"f_or_mteach"])
+for (j in 1:nrow(sm)) {
+
+  if (sm[j, "Fjob"] == "teacher") sm[j,"f_or_mteach"] <- 1
+  if (sm[j, "Mjob"] == "teacher") sm[j,"f_or_mteach"] <- 1
+}
+
+sm[,"f_or_mteach"] 
+
+pairs(sm[,c("G3","f_or_mteach")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+
+# father or mother earns university degree = 1 
+sm$f_or_medu4 <- 0
+sm[j,"f_or_medu4"] <- as.character(sm[,"f_or_medu4"])
+for (j in 1:nrow(sm)) {
+
+  if (sm[j, "Medu"] == 4) sm[j,"f_or_medu4"] <- 1
+  if (sm[j, "Fedu"] == 4) sm[j,"f_or_medu4"] <- 1
+}
+
+sm[,"f_or_medu4"] 
+pairs(sm[,c("G3","f_or_medu4")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+```
+
+
+REGRESSION
+```{}
+
+# academic performance is measured by the average of exam scores
+sm[, "Score"] <- (sm[, "G1"] + sm[, "G2"] + sm[, "G3"])/3
+
+#Initial regression
+
+reg <- lm(Score ~ school + sex + age + address + famsize + Pstatus + Medu + Fedu + 
+                Mjob + Fjob + reason + guardian + traveltime + studytime + failures + 
+                schoolsup + famsup + paid + activities + nursery + higher + internet + 
+                romantic + famrel + freetime + goout + Dalc + Walc + health + absences +
+                f_or_mteach + f_or_medu4
+                , data = sm)
+summary(reg)
+
+# Step wise variable selection
+reg1 <- update(reg, . ~ . - guardian)
+summary(reg1)
+reg2 <- update(reg1, . ~ . - Fjob)
+summary(reg2)
+reg3 <- update(reg2, . ~ . - Medu)
+summary(reg3)
+reg4 <- update(reg3, . ~ . - Fedu)
+summary(reg4)
+reg5 <- update(reg4, . ~ . - famrel)
+summary(reg5)
+reg6 <- update(reg5, . ~ . - Walc)
+summary(reg6)
+reg7 <- update(reg6, . ~ . - Dalc)
+summary(reg7)
+reg8 <- update(reg7, . ~ . - paid)
+summary(reg8)
+reg9 <- update(reg8, . ~ . - nursery)
+summary(reg9)
+reg10 <- update(reg9, . ~ . - Pstatus)
+summary(reg10)
+reg11 <- update(reg10, . ~ . - school)
+summary(reg11)
+reg12 <- update(reg11, . ~ . - activities)
+summary(reg12)
+reg13 <- update(reg12, . ~ . - f_or_mteach)
+summary(reg13)
+reg14 <- update(reg13, . ~ . - internet)
+summary(reg14)
+reg15 <- update(reg14, . ~ . - Mjob)
+summary(reg15)
+reg16 <- update(reg15, . ~ . - reason)
+summary(reg16)
+reg17 <- update(reg16, . ~ . - age)
+summary(reg17)
+reg18 <- update(reg17, . ~ . - traveltime)
+summary(reg18)
+reg19 <- update(reg18, . ~ . - freetime)
+summary(reg19)
+reg20 <- update(reg19, . ~ . - famsize)
+summary(reg20)
+reg21 <- update(reg20, . ~ . - absences)
+summary(reg21)
+reg22 <- update(reg21, . ~ . - health)
+summary(reg22)
+reg23 <- update(reg22, . ~ . - higher)
+summary(reg23)
+reg24 <- update(reg23, . ~ . - romantic)
+summary(reg24)
+
+
+#To cross check on the final model and the significant variables, we use existing R library:
+
+library(MASS)
+step <- stepAIC(reg, direction="both")
+
+#Final Model
+
+library(stargazer)
+stargazer(reg24, type = "text", digits = 2)
+
+```
+
+```{}
+
+# residual plot
+fit_res <-  data.frame(sm, fitted.value = fitted(reg24), residual = resid(reg24))
+
+ggplot(data = fit_res) + geom_point(aes(x = Score, y = residual)) + geom_hline(yintercept = 0) + labs(x = "Academic Score", y= "residual", title = "Residual Plot of Academic Score Regression")
+```
+
+
+from the regression result, we can see that alcohol consumption is not one of the significant variables that explains student academic performance. Instead, they are:
+1) sex
+2) address
+3) study time
+4) number of past class failure
+5) extra educational school support
+6) family educational support
+7) frequency of going out with friends
+8) parents level of education
+
+However, statistically, the model itself does not explain academic score very well, as we see through the R2 result as well as the residual plot graph. the r2 is 21.74%, which means that the model can only explain 21.74% of the variance in student's academic score. while the residual plot graph does not show a random scattered plot.
+
+there are other significant factors not available in the dataset that we think can explain score better. for example, IQ and EQ score, nutrition, or time spent for physical exercise.
+
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
@@ -102,20 +259,13 @@ plot(pressure)
 ## References
 European Commission (2010). Europe 2020 – A Strategy for smart, sustainable and inclusive growth. [online] Available at: http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=COM:2010:2020:FIN:EN:PDF [Accessed: 11.10.2016]
 
-Keng, S.H. and Huffman, W.E., 2010. Binge drinking and labor market success: a longitudinal study on young people. Journal of Population Economics, 23(1), pp.303-322.
 
-Statista (2016).  Countries with the highest per capita consumption of alcohol in 2015 (in liters of pure alcohol per year).  Available at https://www.statista.com/statistics/280139/countries-with-highest-per-capita-consumption-of-alcohol/ [Accessed 11.10.2016]
-
-
-=======
->>>>>>> e1d610a7d350a432b8796c89b01b49246056ddb9
-
-# Appendices
+## Appendices
 
 ## Appendix A
 Attribute Information:
 
-#### Attributes in the Dataset: 
+# Attributes in the Dataset: 
 1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira) 
 
 2 sex - student's sex (binary: 'F' - female or 'M' - male) 
@@ -175,7 +325,7 @@ Attribute Information:
 
 30 absences - number of school absences (numeric: from 0 to 93) 
 
-#### Grades Observed in the Dataset: 
+# Grades Observed in the Dataset: 
 31 G1 - first period grade (numeric: from 0 to 20) 
 
 31 G2 - second period grade (numeric: from 0 to 20) 
