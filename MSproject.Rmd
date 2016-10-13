@@ -7,7 +7,6 @@ Data set source: P. Cortez and A. Silva. Using Data Mining to Predict Secondary 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 # Students' Alcohol Consumption impacts on academic Results on the example of a secondary Scool Maths Class in Portugal
 
@@ -45,41 +44,210 @@ The dataset used for this paper contains information about students in Portugal 
 
 
 
-## Description of Dataset
+## Description of Dataset and Descriptive Statistics 
 
-```{r pressure, echo=FALSE}
+```{r pressure, include=FALSE}
 sm <- read.csv("student-mat.csv", sep=';')
-str(sm)
-summary(sm[,"age"])
+
+# Descriptive statistics
+library(ggplot2)
+
+
+meanAge <- mean(sm[,'age']) #16.696
+medianAge <- median(sm[,'age']) #17 
+summary(sm[,'sex']) #F=208 #M=187
+summary(sm[,'school']) #Gabriel Pereira = 349   #Mousinho da Silveira = 46
+summary(sm[,'address']) #Rural = 77 #Urban = 307
+summary(sm[,'famsize']) #Greater than 3 = 281 #Less than 3 = 114
+summary(sm[,'Pstatus']) #A = 41 #T = 354
+summary(sm[,'internet']) #no = 66 #yes=329
+summary(sm[,'romantic']) #no=263 #yes=132
+
+########################################################
+# Blank Theme for Pie Charts below
+
+blank_theme <- theme_minimal()+ theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.border = element_blank(),
+    panel.grid=element_blank(),
+    axis.ticks = element_blank(),
+    plot.title=element_text(size=14, face="bold")
+  )
+########################################################
+# Sex
+summary(sm[,'sex']) 
+#F=208 #M=187
+
+df_gender <- data.frame(Gender=c("Female", "Male"), value=c(208, 187))
+pie_gender <- ggplot(data=df_sex, aes(x="", y=value, fill=Gender)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme + 
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+
+
+###
+# Address
+summary(sm[,'address']) 
+#Rural = 77 #Urban = 307
+
+df_address <- data.frame(Address=c("Rural", "Urban"), value=c(77, 307))
+pie_address <- ggplot(data=df_address, aes(x="", y=value, fill=Address)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme + 
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+
+
+###
+#Study Time
+
+studyTime <- table(sm$studytime)
+#  1   2   3   4 
+# 105 198  65  27 
+
+df_studyTime <- data.frame(Study_Time=c('<2 hours', "2 to 5 hours", "5 to 10 hours", ">10 hours"), value=c(105, 198, 65, 27))
+#weekly study time (numeric: 1 - <2 hours, 2 - 2 to 5 hours, 3 - 5 to 10 hours, or 4 - >10 hours)
+
+bar_studytime <- ggplot(data=df_studyTime, aes(x="", y=value, fill=Study_Time)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  scale_fill_brewer() + blank_theme + 
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+
+
+###
+# Failures
+# number of past class failures (numeric: n if 1<=n<3, else 4)
+
+failures <- table(sm$failures)
+# 0   1   2   3 
+# 312  50  17  16 
+df_failures <- data.frame(Failures_Times=c("0", "1", "2", "3"), value=c(312, 50, 17, 16))
+
+pie_failures <- ggplot(data=df_failures, aes(x="", y=value, fill=Failures_Times)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme + 
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+
+
+###
+# Schools
+summary(sm[,'school']) 
+#Gabriel Pereira = 349   #Mousinho da Silveira = 46
+
+df_school <- data.frame(Schools=c("Gabriel Pereira", "Mousinho da Silveira"), value=c(349,46))
+bar_school <- ggplot(data=df_school, aes(x="", y=value, fill=Schools)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  blank_theme + 
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) 
+
+
+###
+# Father's Job
+summary(sm[,'Fjob'])
+ggplot(data=sm) + geom_bar(aes((sm[,'Fjob']))) + labs(x="Father's Job")
+# at_home   health  other  services  teacher 
+#   20       18      217      111       29 
+
+df_fjob <- data.frame(Group = c("Health", "Work at Home", "Teacher", "Servies", "Other"), value = c(18, 20, 29, 111, 217))
+pie_fjob <- ggplot(data = df_fjob, aes(x="", y=value, fill=Group)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme +
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) +
+  ggtitle("Father's Job")
+
+
+###
+# Mother's Job
+summary(sm[,'Mjob'])
+ggplot(data=sm) + geom_bar(aes((sm[,'Mjob']))) + labs(x="Mother's Job")
+# at_home   health  other  services  teacher 
+# 59       34        141      103       58
+
+df_mjob <- data.frame(Group = c("Health", "Teacher", "Work at Home", "Services", "Other"), value = c(34, 58, 59, 103, 141))
+pie_mjob <- ggplot(data = df_mjob, aes(x="", y=value, fill=Group)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme +
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) +
+  ggtitle("Mother's Job")
+
+
+###
+# Student's Guardian
+summary(sm[,'guardian'])
+ggplot(data=sm) + geom_bar(aes(guardian)) + labs(x="Student's Guardian")
+# father mother  other 
+# 90    273     32 
+
+df_guardian <- data.frame(group = c("Father", "Mother", "Other"), value = c(90, 273, 32))
+pie_guardian <- ggplot(data = df_guardian, aes(x="", y=value, fill=group)) + 
+  geom_bar(width = 1, stat = "identity") + 
+  coord_polar("y", start=0) + 
+  scale_fill_brewer() + blank_theme +
+  theme(axis.text.x=element_blank()) +
+  geom_text(aes(y = value/3 + c(0, cumsum(value)[-length(value)]), label = (value)), size=4) +
+  ggtitle("Guardian")
+
+
+###############################################################################################
+
 ```
 
-The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into six areas of information: 
+The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into five areas of information: 
 
 #### 1. General Information
-General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. The split between male and female students is .....and most student would live in an urban environment (.....), while % live in an rural environment. 
+General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. Out of the total of 395, there are 52.7% female and 47.3% male students. Most students would live in an urban environment, while approx. 20% live in an rural environment. 
+
+```{r, echo=FALSE}
+pie_gender
+
+pie_address
+```
+
 
 #### 2. Family  
 Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian. 
 
+```{r, echo=FALSE}
+pie_fjob
+
+pie_mjob
+
+pie_guardian
+```
+
+
 #### 3. Education
 The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken, whether they have failed to pass any classes and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
 
-#### 4. Social Life  
-The social life section provieds information on activities the student is involved in outside of school. This includes
+```{r, echo=FALSE}
+bar_school
+bar_studytime
 
-#### 5. Health 
-
-#### 6. Grades
-The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. 
-
-
-## Descriptive Statistics 
-
-You can include R code in the document as follows:
-
-```{r cars}
-summary(cars)
 ```
+
+
+#### 4. Social Life and Health 
+The social life section provieds information on activities the student is involved in outside of school. This includes 
+
+#### 5. Grades
+The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of thy analysis, G1 and G2 will be neglected. 
+```{r, echo=FALSE}
+pie_failures
+
+```
+
 
 ## Correlation Analysis
 
@@ -396,12 +564,6 @@ layout(matrix(1:2, ncol = 2))
 cdplot(sm[,"failures"] ~ sm[,"Dalc"], data = sm)
 cdplot(sm[,"failures"] ~ sm[,"Walc"], data = sm)
 ```
-
-
-
-
-
-
 
 
 #T
