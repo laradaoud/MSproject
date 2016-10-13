@@ -23,7 +23,7 @@ Content:
     + b. Family
     + c. Education 
     + d. Social Life and Health
-    + e. Grades  \n
+    + e. Grades 
      
     
 3. Hypothesis Testing
