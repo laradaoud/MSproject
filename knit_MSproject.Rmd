@@ -50,7 +50,7 @@ The dataset used for this paper contains information about students in Portugal 
 ## 2. Dataset Description and Descriptive Statistics 
 ```{r a, include=FALSE}
 ########################## Read csv file########################
-sm <- read.csv("/Users/deasysibarani/Desktop/Math_Statistics_Foundations/Group Project/student/student-mat.csv", sep=';') 
+sm <- read.csv("student-mat.csv", sep=';') 
 # academic performance is measured by the average of exam scores
 sm[, "Score"] <- (sm[, "G1"] + sm[, "G2"] + sm[, "G3"])/3
 
@@ -58,6 +58,7 @@ sm[, "Score"] <- (sm[, "G1"] + sm[, "G2"] + sm[, "G3"])/3
 ############## Variable modification/derivation ################
 
 # 1. father or mother job is teacher = 1
+
 sm$f_or_mteach <- 0
 sm[,"f_or_mteach"] <- as.character(sm[,"f_or_mteach"])
 for (j in 1:nrow(sm)) {
@@ -68,7 +69,8 @@ for (j in 1:nrow(sm)) {
 sm[,"f_or_mteach"] <- as.numeric(sm[,"f_or_mteach"])
 
 
-# 2. father or mother earns university degree = 1 
+# 2. father or mother earns university degree = 1
+
 sm$f_or_medu <- 0
 sm[,"f_or_medu"] <- as.character(sm[,"f_or_medu"])
 for (j in 1:nrow(sm)) {
@@ -90,7 +92,6 @@ for (j in 1:nrow(sm)) {
 sm[,"higher_ed"] <- as.numeric(sm[,"higher_ed"])
 
 ################################################################################
-
 
 # Descriptive statistics
 library(ggplot2)
