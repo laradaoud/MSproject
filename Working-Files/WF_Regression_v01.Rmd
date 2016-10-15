@@ -1,0 +1,226 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+IV. Regression
+
+In this report, we would like to find the relationship between the math final course grade ("G3") and potential predictors (student-related variables). We will perform a multivariate regression analysis to predict final grade and use step-wise variable selection method. Prior to the regression analysis, we want to get a general idea about the relationship between the variables. There are several things we want to inspect :
+1) Distribution of response variable
+if there is skewness in the distribution, we should consider transforming the variable (i.e logarithmic)
+2) Correlation between response variable and each explanatory variables
+3) Correlation among explanatory variables
+if there is a high correlation among explanatory variables, then there is possible multicollinearity problem
+
+After performing the inspection and do the necessary action, we will continue with the regression. 
+
+
+I. Distribution of Response Variable
+```{r setup, include=FALSE}
+ggplot(sm) + geom_density(aes(x=G3))
+```
+From the graph, we can see that the distribution is slightly left-skewed. Generally, we would transform the variable to become more normally distributed. However, for the purpose of this project, we will not do any transfomation on the response variable and assume that the distribution is normal.
+
+II. Correlation between response variable and each explanatory variables
+```{r setup, include=FALSE}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
+            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
+            "schoolsup","famsup","paid","activities","nursery","higher","internet",
+            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
+      lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+III. 
+
+```{r setup, include=FALSE}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+  usr <- par("usr"); on.exit(par(usr))
+  par(usr = c(0, 1, 0, 1))
+  r <- abs(cor(x, y))
+  txt <- format(c(r, 0.123456789), digits = digits)[1]
+  txt <- paste0(prefix, txt)
+  if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+  text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(sm[,c("G3", "G1","G2","school","sex","age", "address","famsize","Pstatus","Medu","Fedu",
+            "Mjob","Fjob","reason","guardian","traveltime","studytime","failures",
+            "schoolsup","famsup","paid","activities","nursery","higher","internet",
+            "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")],
+      lower.panel = panel.smooth, upper.panel = panel.cor)
+```
+
+
+
+
+```{r setup, include=FALSE}
+setwd("/Users/deasysibarani/Desktop/Math_Statistics_Foundations/Group Project/student")
+sm=read.table("student-mat.csv",sep=";",header=TRUE)
+library(ggplot2)
+
+#1a. check distribution of G3
+
+ggplot(sm) + geom_bar(aes(x=G3))
+
+  
+#1b. check correlation to G3 (as dependent variable) & relationship
+
+
+
+pairs(sm[,c("G3", "G1","G2")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+pairs(sm[,c("G3","school","sex","age", "address","famsize","Pstatus","Medu","Fedu")], lower.panel = panel.smooth, upper.panel = panel.cor)
+#Medu = .22
+
+pairs(sm[,c("G3","Mjob","Fjob","reason","guardian","traveltime","studytime","failures")], lower.panel = panel.smooth, upper.panel = panel.cor)
+#G3 & failure = .36
+
+pairs(sm[,c("G3","schoolsup","famsup","paid","activities","nursery","higher","internet")], lower.panel = panel.smooth, upper.panel = panel.cor)
+#G3 & higher = .18
+
+pairs(sm[,c("G3", "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")], lower.panel = panel.smooth, upper.panel = panel.cor)
+#dalc & walc = 0.65
+#walc & goout = 0.42
+
+
+
+pairs(sm[,c("Medu","Fedu")], lower.panel = panel.smooth, upper.panel = panel.cor)
+pairs(sm[,c("romantic","Pstatus")], lower.panel = panel.smooth, upper.panel = panel.cor)
+pairs(sm[,c("school","G3")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+pairs(sm[,c("Mjob","Fjob")], lower.panel = panel.smooth, upper.panel = panel.cor)
+pairs(sm[,c("absences","studytime","goout","Dalc","Walc","freetime")], lower.panel = panel.smooth, upper.panel = panel.cor)
+pairs(sm[,c("absences","Pstatus","romantic","studytime","goout","Dalc","Walc","freetime")], lower.panel = panel.smooth, upper.panel = panel.cor)
+pairs(sm[,c("internet","health")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+
+#2. derive variables
+
+# F + M Teacher
+sm$f_or_mteach <- 0
+sm[j,"f_or_mteach"] <- as.character(sm[,"f_or_mteach"])
+for (j in 1:nrow(sm)) {
+
+  if (sm[j, "Fjob"] == "teacher") sm[j,"f_or_mteach"] <- 1
+  if (sm[j, "Mjob"] == "teacher") sm[j,"f_or_mteach"] <- 1
+}
+
+sm[,"f_or_mteach"] 
+
+pairs(sm[,c("G3","f_or_mteach")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+
+# F or M education university 
+sm$f_or_medu4 <- 0
+sm[j,"f_or_medu4"] <- as.character(sm[,"f_or_medu4"])
+for (j in 1:nrow(sm)) {
+
+  if (sm[j, "Medu"] == 4) sm[j,"f_or_medu4"] <- 1
+  if (sm[j, "Fedu"] == 4) sm[j,"f_or_medu4"] <- 1
+}
+
+sm[,"f_or_medu4"] 
+pairs(sm[,c("G3","f_or_medu4")], lower.panel = panel.smooth, upper.panel = panel.cor)
+
+
+#3. Initial regression
+
+reg <- lm(G3 ~ school + G1 + G2 + sex + age + address + famsize + Pstatus + Medu + Fedu + 
+                Mjob + Fjob + reason + guardian + traveltime + studytime + failures + 
+                schoolsup + famsup + paid + activities + nursery + higher + internet + 
+                romantic + famrel + freetime + goout + Dalc + Walc + health + absences +
+                f_or_mteach + f_or_medu
+                , data = sm)
+summary(reg)
+
+# Amended Version 
+reg1 <- update(reg, . ~ . - guardian)
+summary(reg1)
+reg2 <- update(reg1, . ~ . - Mjob)
+summary(reg2)
+reg3 <- update(reg2, . ~ . - Fjob)
+summary(reg3)
+reg4 <- update(reg3, . ~ . - address)
+summary(reg4)
+reg5 <- update(reg4, . ~ . - famsize)
+summary(reg5)
+reg6 <- update(reg5, . ~ . - goout)
+summary(reg6)
+reg7 <- update(reg6, . ~ . - traveltime)
+summary(reg7)
+reg8 <- update(reg7, . ~ . - paid)
+summary(reg8)
+reg9 <- update(reg8, . ~ . - freetime)
+summary(reg9)
+reg10 <- update(reg9, . ~ . - reason)
+summary(reg10)
+reg11 <- update(reg10, . ~ . - Pstatus)
+summary(reg11)
+reg12 <- update(reg11, . ~ . - higher)
+summary(reg12)
+reg13 <- update(reg12, . ~ . - sex)
+summary(reg13)
+reg14 <- update(reg13, . ~ . - internet)
+summary(reg14)
+reg15 <- update(reg14, . ~ . - nursery)
+summary(reg15)
+reg16 <- update(reg15, . ~ . - famsup)
+summary(reg16)
+reg17 <- update(reg16, . ~ . - studytime)
+summary(reg17)
+reg18 <- update(reg17, . ~ . - Dalc)
+summary(reg18)
+reg19 <- update(reg18, . ~ . - health)
+summary(reg19)
+reg20 <- update(reg19, . ~ . - Medu)
+summary(reg20)
+reg21 <- update(reg20, . ~ . - Fedu)
+summary(reg21)
+reg22 <- update(reg21, . ~ . - schoolsup)
+summary(reg22)
+reg23 <- update(reg22, . ~ . - failures)
+summary(reg23)
+reg24 <- update(reg23, . ~ . - school)
+summary(reg24)
+reg25 <- update(reg24, . ~ . - romantic)
+summary(reg25)
+reg26 <- update(reg25, . ~ . - Walc)
+summary(reg26)
+reg27 <- update(reg26, . ~ . - activities)
+summary(reg27)
+
+
+
+#To cross check :
+
+install.package("mass")
+library(MASS)
+step <- stepAIC(reg, direction="both")
+
+#5. Final Model
+
+install.packages("stargazer")
+library(texreg)
+library(stargazer)
+
+# residual plot
+  #  assess whether the observed error (residuals) is consistent with stochastic error
+fit_res <-  data.frame(d1, fitted.value = fitted(reg27), residual = resid(reg27))
+
+ggplot(data = fit_res) + geom_point(aes(x = G3, y = residual)) + geom_hline(yintercept = 0)
+
+
+```
+
