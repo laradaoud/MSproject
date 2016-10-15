@@ -9,7 +9,7 @@ Data set source: P. Cortez and A. Silva. Using Data Mining to Predict Secondary 
 
 
 
-**Content:** 
+**Content**: 
 
 1. Introduction
 
@@ -244,56 +244,60 @@ pie_guardian <- ggplot(data = df_guardian, aes(x="", y=value, fill=Type)) +
 
 The dataset examined provides sample data of two secondary schools in Portugal, providing a total of 395 objects (students) and 33 variables (items on information on each student). A list of all variables and their description can be found in Appendix A. The data can be grouped into five areas of information: 
 
-**a. General Information**
-General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. Out of the total of 395, there are 52.7% female and 47.3% male students. Most students would live in an urban environment, while approx. 20% live in an rural environment. 
 
-**Figure 1. General Information**
+**a. General Information**
+General information about the students include gender, address and age. From the descriptive statistics (section 3) we can derive that the age from the students in this dataset ranges from 15 to 22 years with an average of 16.7 years. Out of the total of 395, there are 52.7% female and 47.3% male students. Most students would live in an urban environment, while approx. 20% live in an rural environment.
+
 ```{r b, echo=FALSE}
 grid.arrange(pie_gender, pie_address, ncol=2)
 ```
 
+*Figure 1. General Information*
+
 
 **b. Family**  
-Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian. 
+Information in the students families includes the family size, educational background of their parents and their jobs, and the student's guardian.
 
-**Figure 2. Family**
 ```{r c, echo=FALSE}
 grid.arrange(pie_guardian, pie_fjob, pie_mjob, widths = c(1, 1, 2), layout_matrix = rbind(c(1,1,1), c(2,2,3)))
 ```
 
+*Figure 2. Family*
+
+
 **c. Education**
 The education section of this dataset covers the split between the two schools observed, why each student has chosen that particular school, and how long it takes each student to get to school. In addition, it provides information on the student's study time, extra educational support or classes taken and if the student is involved in extra curricular activities. Finally, there is data on their previous education and aspirations on whether to go into higher education. 
 
-
-**Figure 3. Education**
 ```{r d, echo=FALSE}
 grid.arrange(bar_studytime, bar_school, ncol=2)
 
 ```
 
+*Figure 3. Education*
+
+
 **d. Social Life and Health**
 The social life section provides information on activities the student is involved in outside of school. This includes how much leisure time they have, whether they are in a relationship and how often they go out. Moreover, there is data on how much alcohol students consume and in what health condition they are in. 
+
 
 **e. Grades**
 The grades are split into three grades: the first period (G1), second period (G2) and final grade (G3). For the purpose of this analysis, students academic performance will be measured as the average of all three grades. In addition, there is information on whether they have failed to pass any classes. 
 
-**Figure 4. Past Class Failures**
 ```{r e, echo=FALSE}
 pie_failures
 ```
 
+*Figure 4. Past Class Failures*
+
 =======
 
 ## 3. Hypothesis Testing
-
 As aforementioned, this paper looks into factors influencing academic performance. Our expectation is to see a high correlation between family background and social activities on students' performances. In particular, we are interested to see how alcohol consumption is impacting students' grades. Our basic assumption is that alcohol consumption has a negative impact on students grade. Thus, the Null Hypothesis (H0) to be checked assumes that alcohol consumption does not have an impact on academic performance. To test this hypothesis, multivariate regression analysis will be applied on the 395 samples of students described above. This will allow us to see the significant factors that contribute to academic performance, and check whether or not alcohol consumption is one of them. In this regression, grade is assigned as the dependent variable, and all other variables are treated as independent variables. If alcohol appeared as one of the significant variables in the regression, the null hypothesis will be rejected, inferring that alcohol **is** one of the variables related to academic performance. 
 
 =======
 
 ## 4. Correlation Analysis and Regression
-
 Prior to regression, there are several items that need to be inspected :
-
 
 a) Distribution of Response Variable
     
@@ -304,9 +308,6 @@ b) Correlation Analysis
 Correlation between response and explanatory variables is required to get a general view of the variables   relationships. In addition, correlation between explanatory variables will also be assessed to avoid a multicollinearity problem, as well as to provide other insights from the data.  
 
 #### a. Distribution of Response Variable
-
-
-
 ```{r f, echo=FALSE}
 sm[,"Score"] <- (sm[,"G1"] + sm[,"G2"] + sm[,"G3"])/3
 
@@ -314,13 +315,12 @@ ggplot(sm) + geom_density(aes(x=Score, fill = Score, colour = Score)) + labs(x =
 
 summary(sm[,"Score"])
 ```
-
-
 As seen from the graph, the distribution is slightly right-skewed, but very close to normal distribution. The deviation from the normal distribution could be due to a small sample size. Thus, applying a multivariate regression method is appropriate to test the hypothesis, and no variable transformation is required.
 
-#### b. Correlation Analysis
 
+#### b. Correlation Analysis
 After performing correlation of all explanatory variables against grade (response variable), four variables appear to have high a correlation to grade :
+
 
 **1) Parent's Education**
 ```{r g, echo=FALSE}
@@ -328,11 +328,13 @@ cor.test(sm[,"f_or_medu"],sm[,"Score"])
 ```
 The correlation between parent's education and grade is 0.23. With 95% confidence interval and a p-value of 3.586e-06, we can reject the null hypothesis, which states that there is no correlation between these two variables. This means that parent's education **has a positive correlation** with the student's grade, and that students who have parents with university degrees are more likely to have higher scores than those who do not.
 
+
 **2) Want to have higher education**
 ```{r h, echo=FALSE}
 cor.test(sm[,"higher_ed"],sm[,"Score"])
 ```
 The correlation between students' aspirations to get higher education and grade is 0.189. With 95% confidence interval and a p-value of 0.0001517, we can reject the null hypothesis, which states that theres is no correlation between these two variables, and that grades do in fact correlate positively with their aspiration to take higher education. 
+
 
 **3) Number of past class failure**
 ```{r i, echo=FALSE}
@@ -340,11 +342,11 @@ cor.test(sm$Score,sm$failures)
 ```
 The correlation between number of past class failure and grade is -0.375. With 95% confidence interval and a p-value of 1.08e-14, we can reject the null hypothesis, which states that there is no correlation between these two variables, and conclude that indeed, the number of past class failures is negatively correlated with grades. Students who have failed more classes tend to have lower grades.
 
+
 **4) Frequency of going out with friends**
 ```{r i1, echo=FALSE}
 cor.test(sm$Score,sm$goout)
 ```
-
 The correlation between the frequency of going out with friends and grade is -0.154. With 95% confidence interval and a p-value of 0.002073, we can reject the null hypothesis, which states that there is no correlation between these two variables, and conclude the frequency of going out with friends are negatively correlated with grades. Students who go out more often are more likely to have lower grades. In the following section, regression analysis will be performed to identify a fitting model which explains the students' academic performances and influencing factors.
 
 
@@ -352,14 +354,14 @@ The correlation between the frequency of going out with friends and grade is -0.
 ```{r i2, echo=FALSE}
 cor.test(sm$Score,sm$Walc)
 ```
-
 As shown above, alcohol consumption does not have a significant correlation to students' grades. The test result shows a correlation of -0.08. With 95% confidence interval and a p-value of 8%, we can **not** reject the null hypothesis, which states that there is no correlation between these two variables. Therefore, we can conclude alcohol consumption does not have a significant impact on students' grades, which will also be verified in the following multivariate regression analysis.
 
-#### c. Regression
 
+#### c. Regression
 After assessing the correlations between all the variables, multivariate regression will be applied. Firstly, all variables are put in the regression model. Secondly, the variable with the highest p-value is eliminated from the model. This iterative process is repeated until a model with a satisfying R2 value can be derived, which consists of significant explanatory variables. 
 
-Initial Regression Model :
+
+**Initial Regression Model:**
 
 ```{r i4a, echo=TRUE}
 #Initial Regression
@@ -432,7 +434,8 @@ library(stargazer)
 #step <- stepAIC(reg, direction="both")
 ```
 
-**Figure 5. Final Regression Model**
+
+**Final Regression Model**
 
 The results of the iterative process are shown in the figure below.
 
@@ -441,6 +444,8 @@ The results of the iterative process are shown in the figure below.
 
 stargazer(reg24, type = "text", digits = 2)
 ```
+*Figure 5. Final Regression Model*
+
 
 These results verfify that alcohol consumption is not one of the significant variables that explains student academic performance. Instead, the dependent variables which best explain the model are following:
 
@@ -463,20 +468,19 @@ These results verfify that alcohol consumption is not one of the significant var
 The adjusted R2 is 21.74%, which means that the model can explain 21.74% of the variance in students' academic scores. The residual plot shown below (figure 6) does not show a randomly dispersed points around the x axis, which means that the residual does not sum up to zero. For predicted academic scores around 10, the model is closer to the observed values. For lower predicted scores, the model overestimates, and for higher scores, the predicted values are too low. There are other significant factors which are neither captured in the dataset nor the model, that can contribute to an explanation of students' academic scores. General knowledge indicates that IQ score, EQ score, nutrition, or time spent for physical exercise can have an impact on students' academic performance.
 
 
-**Figure 6. Residual Plot**
-
-```{r a1, echo=TRUE}
+```{r a1, echo=FALSE}
 # residual plot
 fit_res <-  data.frame(sm, fitted.value = fitted(reg24), residual = resid(reg24))
 
 ggplot(data = fit_res) + geom_point(aes(x = Score, y = residual)) + geom_hline(yintercept = 0) + labs(x = "Academic Score", y= "residual", title = "Residual Plot of Academic Score Regression")
 ```
 
+*Figure 6. Residual Plot*
 
 
 ####Grades and Alcohol Consumption
-
 Both the correlation test and regression model show that alcohol consumption does not directly affect students' grades. However, examining the correlation between alcohol consumption and the frequency of going out as well as students' study time, which have shown to have an impact on students' grades, demonstrates a high correlation. 
+
 
 **1) Frequency of going out with friends**
 ```{r i3, echo=FALSE}
@@ -497,7 +501,6 @@ Study time also shows a high correlation of -0.25 and -0.19 for weekend and work
 =======
 
 ## 5. Conclusion
-
 The study done by Keng and Huffman (2010) outlined that alcohol abuse has a negative impact labor market outcomes. However, this correlation could not be replicated for secondary school students: the result of the analysis show no direct correlation between alcohol consumption and secondary school students' academic performance. Alcohol consumption amongst secondary school students is highly correlated to two factors, which do in fact impact students academic performance, namely frequency of going out with friends as well as study time. Further research needs to be done to identify reasons for discrepancy between both studies, which could be due to a variety of different factors. Firstly, the values given in the data (from 1 - very low to 5- very high) do not indicate whether there is abusive alcohol consumption and leave room for personal interpretation. Furthermore, small sample size and age restriction for drinking alcohol could also impact the result. It could also be researched whether the alcohol's impact on people's concentration and performance takes time to show effects and thus would not necessarily impact students' grades at this stage. In conclusion, a more specific study needs to be designed to investigate the impact of these factors and other aspects to draw further conclusions on alcohol consumption in relation to academic achievements.
 
 =======
@@ -505,14 +508,18 @@ The study done by Keng and Huffman (2010) outlined that alcohol abuse has a nega
 ## 6. References
 European Commission (2010). Europe 2020 – A Strategy for smart, sustainable and inclusive growth. [online] Available at: http://eur-lex.europa.eu/LexUriServ/LexUriServ.do?uri=COM:2010:2020:FIN:EN:PDF [Accessed: 11.10.2016]
 
+Keng, S.H. and Huffman, W.E., 2010. Binge drinking and labor market success: a longitudinal study on young people. Journal of Population Economics, 23(1), pp.303-322.
+
+OECD (2013). Education at a Glance 2013. Available at https://www.oecd.org/edu/Portugal_EAG2013%20Country%20Note.pdf. [Accessed 11.10.2016]
+
+Statista (2016). Countries with the highest per capita consumption of alcohol in 2015 (in liters of pure alcohol per year). Available at https://www.statista.com/statistics/280139/countries-with-highest-per-capita-consumption-of-alcohol/ [Accessed 11.10.2016]
+
 =======
 
-## 7. Appendices
-
-### Appendix A
-Attribute Information:
+## 7. Appendix
 
 **Attributes in the Dataset:** 
+
 1 school - student's school (binary: 'GP' - Gabriel Pereira or 'MS' - Mousinho da Silveira) 
 
 2 sex - student's sex (binary: 'F' - female or 'M' - male) 
@@ -573,6 +580,7 @@ Attribute Information:
 30 absences - number of school absences (numeric: from 0 to 93) 
 
 **Grades Observed in the Dataset:**
+
 31 G1 - first period grade (numeric: from 0 to 20) 
 
 31 G2 - second period grade (numeric: from 0 to 20) 
